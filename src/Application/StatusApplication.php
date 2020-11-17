@@ -102,7 +102,7 @@ class StatusApplication extends Application
     public function clientConnected(string $ip, int $port): void
     {
         $client = $ip . ':' . $port;
-        $this->serverClients[$client] = true;
+        $this->serverClients[$client] = date("U");
         $this->serverClientCount++;
         $this->statusMsg('Client connected: ' . $client);
         $data = [
