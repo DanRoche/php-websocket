@@ -101,12 +101,12 @@ class StatusApplication extends Application
      */
     public function clientConnected(string $ip, int $port): void
     {
-        $this->serverClients[$ip.":".$port] = date("U");
+        $client = $ip . ':' . $port;
+        $this->serverClients[$client] = true;
         $this->serverClientCount++;
-        $this->statusMsg('Client connected: ' . $ip . ':' . $port);
+        $this->statusMsg('Client connected: ' . $client);
         $data = [
-            'ip' => $ip,
-            'port' => $port,
+            'client' => $client,
             'clientCount' => $this->serverClientCount,
         ];
         $encodedData = $this->encodeData('clientConnected', $data);
@@ -122,14 +122,15 @@ class StatusApplication extends Application
      */
     public function clientDisconnected(string $ip, int $port): void
     {
-        if (!isset($this->serverClients[$ip.":".$port])) {
+        $client = $ip . ':' . $port;
+        if (!isset($this->serverClients[$client])) {
             return;
         }
-        unset($this->serverClients[$ip.":".$port]);
+        unset($this->serverClients[$client]);
         $this->serverClientCount--;
-        $this->statusMsg('Client disconnected: ' . $ip . ':' . $port);
+        $this->statusMsg('Client disconnected: ' . $client);
         $data = [
-            'port' => $port,
+            'client' => $client,
             'clientCount' => $this->serverClientCount,
         ];
         $encodedData = $this->encodeData('clientDisconnected', $data);
@@ -139,12 +140,12 @@ class StatusApplication extends Application
     /**
      * This method will be called by server whenever there is activity on a port.
      *
-     * @param int $port
+     * @param string $client
      * @return void
      */
-    public function clientActivity(int $port): void
+    public function clientActivity(string $client): void
     {
-        $encodedData = $this->encodeData('clientActivity', $port);
+        $encodedData = $this->encodeData('clientActivity', $client);
         $this->sendAll($encodedData);
     }
 
